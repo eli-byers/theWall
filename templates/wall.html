@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>{{ session['name'].title() }} - Wall</title>
+
+    <!-- jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  	<!-- Latest compiled and minified CSS -->
+  	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  	<!-- Optional theme -->
+  	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+  	<!-- Latest compiled and minified JavaScript -->
+  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+    <!-- style -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='wall.css') }}">
+  </head>
+  <body>
+    <div class="container">
+
+      <!-- header -->
+      <div class="page-header">
+        <div class='btn-toolbar pull-right'>
+          <div class='btn-group'>
+            <a href="/logout" class='btn btn-primary pull-right'>Log Out</a>
+          </div>
+        </div>
+        <h1>Welcome {{ session['name'].title() }}</h1>
+        <br>
+      </div>
+      <br>
+
+      <!-- mesasge form -->
+      <div class="row">
+        <div class="col-xs-10 col-xs-offset-1 well">
+          <h3 class='post-head'>Post a message:</h3>
+          <form action="/message" method="post">
+
+            <div class='form-group'>
+              <textarea class='form-control' name="message"></textarea>
+            </div>
+            <div class='form-group'>
+              <input class='btn btn-success pull-right' type="submit" value="Post Message">
+            </div>
+          </form>
+        </div>
+      </div>
+      <hr>
+      
+      <!-- the wall! -->
+      {% for message in messages: %}
+        <div class="row">
+          <div class="col-xs-10 col-xs-offset-1 well">
+
+            <!-- edit/delete buttons -->
+            {% if message['author_id'] == session['user_id']: %}
+              <a href="/message/delete/{{ message['id'] }}" class='btn btn-danger pull-right del'>X</a>
+              <!-- <a href='/message/edit/{{ message['id'] }}' class='btn btn-primary pull-right'>Edit</a> -->
+            {% endif %}
+
+            <!-- message contents -->
+            <p><b>{{message['author']}}:</b> {{message['created_at']}} </p>
+            <p>{{message['text']}}</p>
+
+            <!-- comments -->
+            {% for comment in comments: %}
+              {% if comment['message_id'] == message['id']: %}
+
+                <!-- a comment -->
+                <div class="row">
+                  <div class="col-xs-11 col-xs-offset-1 well well-sm">
+
+                    <!-- edit/delete buttons -->
+                    {% if comment['author_id'] == session['user_id']: %}
+                      <a href="/comment/delete/{{ comment['id'] }}" class='btn btn-danger pull-right del'>X</a>
+                      <!-- <a href='/comment/edit/{{ comment['id'] }}' class='btn btn-primary pull-right'>Edit</a> -->
+                    {% endif %}
+
+                    <!-- comment content -->
+                    <p><b>{{comment['author']}}:</b> {{comment['created_at']}} </p>
+                    <p>{{comment['text']}}</p>
+                  </div>
+
+                </div>
+              {% endif %}
+            {% endfor %}
+
+            <!-- comment form -->
+            <form action="/comment" method="post">
+              <input type="hidden" name="message_id" value="{{ message['id'] }}">
+              <div class='form-group'>
+                <textarea class='form-control' name="text"></textarea>
+              </div>
+              <div class='form-group'>
+                <input class='btn btn-success pull-right' type="submit" value="Comment">
+              </div>
+            </form>
+          </div>
+
+        </div>
+      {% endfor %}
+
+    </div>
+  </body>
+</html>

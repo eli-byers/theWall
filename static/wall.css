@@ -1,0 +1,15 @@
+textarea {
+  resize: none;
+}
+
+.post-head{
+  margin-top: 0px;
+}
+
+.del{
+  margin-left: 20px;
+}
+
+.comment{
+  border: 1px solid grey;
+}
